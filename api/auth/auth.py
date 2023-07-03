@@ -3,7 +3,7 @@ from ..models.user import User
 from http import HTTPStatus
 from flask import request
 from werkzeug.security import check_password_hash, generate_password_hash
-from flask_jwt_extended import create_refresh_token, create_access_token, jwt_required, get_jwt_identity
+from flask_jwt_extended import create_refresh_token, create_access_token, jwt_required, get_jwt_identity, get_jwt
 
 auth_namespace = Namespace('auth', description='user authentication schema')
 signup_model = auth_namespace.model('SignUp', {
@@ -30,11 +30,19 @@ class UserSignUp(Resource):
         full_name = data['full_name']
         email = data['email']
         password = generate_password_hash(data['password'])
-
-        signup_user = User(full_name=full_name, email=email, password=password)
-        signup_user.save()
-
-        return signup_user, HTTPStatus.CREATED
+        
+        user_exist = User.query.filter_by(email=email).first()
+        if user_exist and user_exist.full_name:
+            response = {
+             'message': 'User already exist'
+            }
+            
+            return response, HTTPStatus.UNAUTHORIZED
+        else:
+            signup_user = User(full_name=full_name, email=email, password=password)
+            signup_user.save()
+    
+            return signup_user, HTTPStatus.CREATED
 
 
 @auth_namespace.route('/login')
@@ -100,3 +108,16 @@ class GetUserName(Resource):
         }
 
         return response, HTTPStatus.OK
+        
+@auth_namespace.route('/logout')
+class LogOut(Resource):
+    @jwt_required()
+    def post(self):
+        '''
+            LogOut user by revoking jwt tokens
+        '''
+        response = {
+            'message': 'Successfully logged out user'
+        }
+        return response, HTTPStatus.OK
+        

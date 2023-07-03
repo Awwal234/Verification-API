@@ -7,6 +7,7 @@ from .utils import db
 from .auth.auth import auth_namespace
 from .updates.user_profile_update import user_update_namespace
 from .banks.bank import bank_namespace
+from .bvn.bvnverify import bvn_namespace
 
 
 def create_app():
@@ -26,5 +27,6 @@ def create_app():
     api.add_namespace(auth_namespace, path='/app_api/api')
     api.add_namespace(user_update_namespace, path='/app_api/api/update')
     api.add_namespace(bank_namespace, path='/app_api/api/bank')
+    api.add_namespace(bvn_namespace, path='/app_api/api/bvn')
 
     return app

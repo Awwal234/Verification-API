@@ -51,3 +51,10 @@ class updateUserProfile(Resource):
             }
 
             return response, HTTPStatus.OK
+        else:
+            #looking out for better response here
+            response = {
+                "message": "Error, try again."
+            }
+            
+            return response, HTTPStatus.UNAUTHORIZED
